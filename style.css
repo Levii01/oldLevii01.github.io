@@ -113,18 +113,18 @@ body
 	padding: 30px;
 }
 
-.yt
+.in
 {
 	margin: 10px;
 	width: 105px;
 	height: 142px;
-	background-color: #d94348;
+	background-color: #1985bc;
 	float: left;
 }
 
-.yt:hover
+.in:hover
 {
-	background-color: #c83237;
+	background-color: #0874ab;
 }
 
 .fb
