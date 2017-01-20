@@ -22,6 +22,7 @@ var errors = {
   noMoneyAccount: "You don't have enough money in your account",
   atmNoMoneyAccount: "We must apologise you because we don't have enough money in this ATM." +
   '<br>You need to find another ATM or visit our bank.',
+  negativeValue: "You can't type in a negative value.",
 };
 
 function errorHide()
@@ -56,12 +57,11 @@ function firstChoice() {
 
 function pinOperator() {
   document.getElementById('box2').innerHTML = '<h2>Insert password:</h2> '
-  + '<input type="text" id="passwordPlace" /><button class="button" onclick="testPasswordOperator()"><span>OK</span></button>';
+  + '<form onsubmit="testPasswordOperator();return false;"><input type="text"  id="passwordPlace" required><input type="submit" class="button"  ></form>';
 }
 
 function testPasswordOperator() {
   insertedPassword = document.getElementById('passwordPlace').value;
-  // document.getElementById('box2').innerHTML = insertedPassword == atm.password;
   if (insertedPassword == atm.password) {
     operatorLogIn();
     operatorOption();
@@ -85,36 +85,39 @@ function operatorOption() {
 function atmWithdrawMoney() {
   document.getElementById('box2').innerHTML = '<h2>Withdraw ATM:</h2><br>'
   + 'How much money you want to withdraw?<br>'
-  + '<input type="number" id="removeMoneyAtm" value=0 /><button class="button" onclick="withdrawAtm()"><span>OK</span></button>';
+  + '<form onsubmit="withdrawAtm();return false;"><input type="number"  id="removeMoneyAtm" required><input type="submit" class="button"  ></form>';
 }
 
 function withdrawAtm() {
   insertedMoneyAtm2 = parseInt(document.getElementById('removeMoneyAtm').value);
-  if (atm.money >= insertedMoneyAtm2) {
-    atm.money -= insertedMoneyAtm2;
-    document.getElementById('box2').innerHTML = '<h2>Withdraw ATM:</h2><br>'
-    + 'Amount: ' + insertedMoneyAtm2 + '$<br/> New balance: ' + atm.money + '$';
-    console.warn(new Date() + 'Operator withdraw money from ATM, Amount: ' + insertedMoneyAtm2);
-  }else {
-    document.getElementById('box2').innerHTML = '<h2>Withdraw fail:</h2><br>'
-    + 'Not enough money in ATM';
-    showError(errors.atmNoMoneyOperator);
-  }
+  if (insertedMoneyAtm2 >= 0) {
+    if (atm.money >= insertedMoneyAtm2) {
+      atm.money -= insertedMoneyAtm2;
+      document.getElementById('box2').innerHTML = '<h2>Withdraw ATM:</h2><br>'
+      + 'Amount: ' + insertedMoneyAtm2 + '$<br/> New balance: ' + atm.money + '$';
+      console.warn(new Date() + 'Operator withdraw money from ATM, Amount: ' + insertedMoneyAtm2);
+    }else {
+      document.getElementById('box2').innerHTML = '<h2>Withdraw fail:</h2><br>'
+      + 'Not enough money in ATM';
+      showError(errors.atmNoMoneyOperator);
+    }
+  }else showError(errors.negativeValue);
 }
 
 function atmChargeMoney() {
   document.getElementById('box2').innerHTML = '<h2>Add money to ATM:</h2><br>'
   + 'How much money you want to charge?<br>'
-  + '<input type="number" id="addMoneyAtm" value=0 /><button class="button" onclick="chargeAtm()"><span>OK</span></button>';
+  + '<form onsubmit="chargeAtm();return false;"><input type="number"  id="addMoneyAtm" required><input type="submit" class="button"  ></form>';
 }
 
 function chargeAtm() {
   insertedMoneyAtm = parseInt(document.getElementById('addMoneyAtm').value);
-  atm.money += insertedMoneyAtm;
-  document.getElementById('box2').innerHTML = '<h2>Charged ATM:</h2><br>'
-  + 'Amount: ' + insertedMoneyAtm + '$<br/> New balance: ' + atm.money + '$';
-  console.warn(new Date() + 'Operator charge ATM, Amount: ' + insertedMoneyAtm);
-
+  if (insertedMoneyAtm >= 0) {
+    atm.money += insertedMoneyAtm;
+    document.getElementById('box2').innerHTML = '<h2>Charged ATM:</h2><br>'
+    + 'Amount: ' + insertedMoneyAtm + '$<br/> New balance: ' + atm.money + '$';
+    console.warn(new Date() + 'Operator charge ATM, Amount: ' + insertedMoneyAtm);
+  }else showError(errors.negativeValue);
 }
 
 function showAtmBalance() {
@@ -125,7 +128,7 @@ function showAtmBalance() {
 // account function!!!!!!
 function insertPin() {
   document.getElementById('box2').innerHTML = '<h2>Insert pin card:</h2> '
-  + '<input type="number" id="pin" required/><button class="button" onclick="testPinUser()"><span>OK</span></button>';
+  + '<form onsubmit="testPinUser();return false;"><input type="number"  id="pin" required><input type="submit" class="button"  ></form>';
 }
 
 function testPinUser() {
@@ -160,20 +163,23 @@ function userOption() {
 function userWithdrawMoney() {
   document.getElementById('box2').innerHTML = '<h2>Withdraw money:</h2><br>'
   + 'How much money you want to withdraw?<br>'
-  + '<input type="number" id="removeMoneyAccount" value=0 /><button class="button" onclick="checkWithdrawAccount()"><span>OK</span></button>';
+  + '<form onsubmit="checkWithdrawAccount();return false;"><input type="number"  id="removeMoneyAccount" required><input type="submit" class="button"  ></form>';
+
 }
 
 // document.getElementById(valueStr).value == 0;
 
 function checkWithdrawAccount() {
   insertedMoneyAcc2 = parseInt(document.getElementById('removeMoneyAccount').value);
-  if (account.balance >= insertedMoneyAcc2) {
-    makeWithdrawAccount();
-  }else {
-    document.getElementById('box2').innerHTML = '<h2>Withdraw account:</h2><br>'
-    + 'Somethings gone wrong..';
-    showError(errors.noMoneyAccount);
-  }
+  if (insertedMoneyAcc2 > 0) {
+    if (account.balance >= insertedMoneyAcc2) {
+      makeWithdrawAccount();
+    }else {
+      document.getElementById('box2').innerHTML = '<h2>Withdraw account:</h2><br>'
+      + 'Somethings gone wrong..';
+      showError(errors.noMoneyAccount);
+    }
+  }else showError(errors.negativeValue);
 }
 
 function makeWithdrawAccount() {
@@ -193,17 +199,18 @@ function makeWithdrawAccount() {
 function userChargeMoney() {
   document.getElementById('box2').innerHTML = '<h2>Charged account:</h2><br>'
   + 'How much money you want to charge?<br>'
-  + '<input type="number" id="addMoneyAccount" value=0 /><button class="button" onclick="chargeAccount()"><span>OK</span></button>';
+  + '<form onsubmit="chargeAccount();return false;"><input type="number"  id="addMoneyAccount" required><input type="submit" class="button"  ></form>';
 }
 
 function chargeAccount() {
   insertedMoneyAcc = parseInt(document.getElementById('addMoneyAccount').value);
-  account.balance += insertedMoneyAcc;
-  atm.money += insertedMoneyAcc;
-  document.getElementById('box2').innerHTML = '<h2>Charged account:</h2><br>'
-  + 'Amount: ' + insertedMoneyAcc + '$<br/> New balance: ' + account.balance + '$';
-  console.log(new Date() + 'User charge account, Amount: ' + insertedMoneyAcc);
-
+  if (insertedMoneyAcc > 0) {
+    account.balance += insertedMoneyAcc;
+    atm.money += insertedMoneyAcc;
+    document.getElementById('box2').innerHTML = '<h2>Charged account:</h2><br>'
+    + 'Amount: ' + insertedMoneyAcc + '$<br/> New balance: ' + account.balance + '$';
+    console.log(new Date() + 'User charge account, Amount: ' + insertedMoneyAcc);
+  }else showError(errors.negativeValue);
 }
 
 function owner() {
